@@ -1,5 +1,3 @@
-
-
 /** Randomly return either ‘Rock’, ‘Paper’ or ‘Scissors’. We’ll use this 
  * function in the game to make the computer’s play.  */
 function computerPlay() {
@@ -18,87 +16,85 @@ function computerPlay() {
     return;
 }
 
-/** Ask for player's input, if the input matches, return the input, otherwise continue. */
-function playerPlay() {
-
-    onGoing = true;
-
-    while (onGoing) {
-
-        let output = prompt("What are you going to deal? Paper, Scissor or Rock?");
-        output = output.toLowerCase();
-
-        if (output === "paper" || output === "scissor" || output === "rock") {
-            return output;
-        } else {
-            alert("Input a correct option plz!");
-        }
-    }
-}
-
-
 /** A function that plays a single round of Rock Paper Scissors. The function 
  * should take two parameters - the playerSelection and computerSelection - 
- * and then return a string that declares the winner of the round like so: 
- * "You Lose! Paper beats Rock" 
- * */
-function singleRound(playerSelection, computerSelection) {
+ * and then return a array that declares the winner of the round like so: 
+ * "You Lose! Paper beats Rock" */
+function singleRound(player, computer) {
 
-    player = playerSelection();
-    computer = computerSelection();
-    
     if ((player === "paper" && computer === "rock") ||
         (player === "scissor" && computer === "paper") ||
         (player === "rock" && computer === "scissor")) {
-        return `You won! ${player} beats ${computer}`;
+        // return `You won! ${player} beats ${computer}`;
+        return [1, firstUpper(player), firstUpper(computer)];
     }
     else if ((computer === "paper" && player === "rock") ||
         (computer === "scissor" && player === "paper") ||
         (computer === "rock" && player === "scissor")) {
-        return `You lost! ${computer} beats ${player}`;
+        // return `You lost! ${computer} beats ${player}`;
+        return [-1, firstUpper(player), firstUpper(computer)];
     } else {
-        return "It's a tie!";
+        // return "It's a tie!";
+        return [0];
     }
 
 }
 
-/** a NEW function called game(). Use the previous function inside of this one 
- * to play a 5 round game that keeps score and reports a winner or loser at the end. */
-function game() {
+function firstUpper(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
+/** A function that records the score and make it into the textContent. Also, 
+ * It will take the input from the user(button);
+ */
+function game(event) {
+
+    const mainClass = document.querySelector(".main");
+    const playerPoints = document.querySelector(".pPoints");
+    const computerPoints = document.querySelector(".cPoints");
+    const roundResult = singleRound(event.currentTarget.className, computerPlay())
     
-    let player = 0;
-    let computer = 0;
+    switch (roundResult[0]) {
+        case 1:
+            mainClass.textContent = `You Win! ${roundResult[1]} beats ${roundResult[2]}.`;
+            playerPoints.textContent = +(playerPoints.textContent) + 1;
+            break;
+        case -1:
+            mainClass.textContent = `You Lose! ${roundResult[2]} beats ${roundResult[1]}.`;
+            computerPoints.textContent = +(computerPoints.textContent) + 1;
+            break;
+        case 0:
+            mainClass.textContent = `It's a Tie!`;
 
-    for (let i = 0; i < 5; i+=1) {
-        result = singleRound(playerPlay, computerPlay);
-        console.log(result);
+    }
 
-        switch (result.charAt(4)) {
-            case "w": 
-                player += 1;
-                break;
-            case "l": 
-                computer += 1;
-                break;
-        }
-
-        console.log(`Player: ${player}, Computer: ${computer}`);
-    } 
-
-
-    if (player > computer) {
-        return "Player Wins!";
-    } else if (computer > player) {
-        return "Computer Wins!";
-    } else {
-        return "Tie!"
+    if (+(playerPoints.textContent) === 5) {
+        mainClass.textContent = "YOU WIN THE GAME!";
+        reset();
+    } else if (+(computerPoints.textContent) === 5) {
+        mainClass.textContent = "YOU LOSE THE GAME!";
+        reset();
+    }
+    
+    function reset() {
+        computerPoints.textContent = 0;
+        playerPoints.textContent = 0;
     }
 }
 
-console.log(game());
+
 
 /** A helper method to get random number within a certain range.
  * the number will be floored from 0.0001~2.9999. */
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
+
+/* Events that make button call sigleround */
+const buttons = document.querySelectorAll("button");
+
+buttons.forEach((button) => {
+    button.addEventListener('click', game);
+});
+
+
